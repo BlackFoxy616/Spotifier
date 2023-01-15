@@ -108,7 +108,7 @@ def getplay(playlistlink):
      URL = "https://api.spotify.com/v1/playlists/" + playlist_id  + "/tracks?access_token=" + token
      URL2 = "https://api.spotify.com/v1/playlists/"+ playlist_id +"?access_token=" + token  
      r2 = requests.get(URL2)
-     pyname = 'Playlist/' + r2.json()['name']
+     pyname = 'Playlist/' + r2.json()['name'] + "'"
      r = requests.get(url = URL) 
      total = r.json()['total']
      count=0
