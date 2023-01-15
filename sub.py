@@ -20,12 +20,15 @@ def gettrack(track):
 
 
 def rclone(name):
-    rcl = "rclone --config './rclone.conf' copy '"+name+"' Mirror:/Music/ "
+    rcl = "rclone --config './rclone.conf' copy '"+name+"' Mirror:/Bot/Music/ "
     os.system(rcl)
     print("Uploaded..!!")
 
 
-
+def rclonev(name):
+    rcl = "rclone --config './rclone.conf' copy '"+name+"' Mirror:/Bot/Music/ "
+    os.system(rcl)
+    print("Uploaded..!!")
 
 
 
@@ -119,4 +122,3 @@ def getplay(playlistlink):
          r = requests.get(url = URL)
      return items
          
-getplay("https://open.spotify.com/playlist/6dBDprurUuVxaKlC2B2CJF?si=LZgnzMPJSlijLLlfRnd-5A")
