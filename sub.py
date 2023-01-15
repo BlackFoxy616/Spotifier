@@ -18,39 +18,11 @@ def gettrack(track):
      return track, sample, img 
 
 
-def getplay(playlistlink):
-     playlist_id = playlistlink[34:].split('?')[0]
-     URL = "https://api.spotify.com/v1/playlists/" + playlist_id  + "/tracks?access_token=" + token
-     r = requests.get(url = URL) 
-     total = r.json()['total']
-     for i in range(total):
-         Limit = 0
-         if Limit == 100:
-         
-            print(i,r.json()['items'][i]["track"]["external_urls"]["spotify"])
-
-    
- 
-
-
-getplay("https://open.spotify.com/playlist/6dBDprurUuVxaKlC2B2CJF?si=LZgnzMPJSlijLLlfRnd-5A")
-
-
-
-
-
-
-#json_object = json.dumps(data)
-     #with open("sample.json", "w+") as outfile:
-      # outfile.write(json_object)
-
-
 
 def rclone(name):
     rcl = "rclone --config './rclone.conf' copy '"+name+"' Mirror:/Music/ "
     os.system(rcl)
     print("Uploaded..!!")
-
 
 
 
@@ -79,8 +51,8 @@ def ytsq(link):
    #print(gettrack(tkid)[0])
    #print(videosSearch.result()['result'][0]['link'])
    id = videosSearch.result()['result'][0]['id']
-   yhiu= videosSearch.result()['result'][0]['link']
-   return id , yhiu
+   link = videosSearch.result()['result'][0]['link']
+   return id , link
 
 def ytsn(query):
    videosSearch = VideosSearch(query, limit = 1)
@@ -96,8 +68,7 @@ def dytdl(link):
       ytdl.download(link)
       info=ytdl.extract_info(link)
       id = info['id']
-      return id
-
+      return id 
 
 def urlytdl(link):
       ydl_opts = {'format': 'mp4/240/best',
@@ -106,8 +77,6 @@ def urlytdl(link):
       info= ytdl.extract_info(link,download=False)
       return info['id'],info['url']
 
-
-#print(urlytdl('https://www.pornhub.com/view_video.php?viewkey=ph6298b90bc6e55'))
 
 
 def ytdl(link):
@@ -121,3 +90,33 @@ def ytdl(link):
       }
    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download(ytlink)
+
+
+
+
+def getplay(playlistlink):
+     playlist_id = playlistlink[34:].split('?')[0]
+     URL = "https://api.spotify.com/v1/playlists/" + playlist_id  + "/tracks?access_token=" + token
+     r = requests.get(url = URL) 
+     total = r.json()['total']
+     count=0
+     y=False
+     while not y:  
+      items = r.json()['items']
+      for i in range(len(items)):
+         count +=1
+         #print(count,r.json()['items'][i]["track"]["external_urls"]["spotify"])
+         ytdl(ytsq(r.json()['items'][i]["track"]["external_urls"]["spotify"])[1])
+         for name in os.listdir():
+           if ytsq(r.json()['items'][i]["track"]["external_urls"]["spotify"])[0] in name:
+              rclone(name)
+
+      else:
+         if count ==total:
+            y = True
+            break
+         URL = r.json()['next'] +'&'+ "access_token=" + token
+         r = requests.get(url = URL)
+     return items
+         
+getplay("https://open.spotify.com/playlist/6dBDprurUuVxaKlC2B2CJF?si=LZgnzMPJSlijLLlfRnd-5A")
