@@ -19,14 +19,9 @@ def gettrack(track):
 
 
 
-def rclone(name):
-    rcl = "rclone --config './rclone.conf' copy '"+name+"' Mirror:/Music/ "
+def rclone(name,name2):
+    rcl = "rclone --config './rclone.conf' copy '" +name+ "' 'Mirror:/Bot/'"+ name2
     os.system(rcl)
-    print("Uploaded..!!")
-
-
-
-
 
 
 
@@ -56,7 +51,7 @@ def ytsq(link):
 
 def ytsn(query):
    videosSearch = VideosSearch(query, limit = 1)
-   #print(videosSearch.result()['result'][0]['link'])
+   #print(videosSearch.result()['result'])
    id = videosSearch.result()['result'][0]['id']
    link = videosSearch.result()['result'][0]['link']
    title = videosSearch.result()['result'][0]['title']
@@ -92,11 +87,28 @@ def ytdl(link):
         ydl.download(ytlink)
 
 
+def pwrite(link):
+  with open("playlist.csv","a+") as filec:
+           cwrite = csv.writer(filec)
+           cwrite.writerow([link])
+
+
+
+def pread():
+   global cread
+   filec = open("playlist.csv","r")
+   cread=csv.reader(filec)
+   return cread
+
+
 
 
 def getplay(playlistlink):
      playlist_id = playlistlink[34:].split('?')[0]
      URL = "https://api.spotify.com/v1/playlists/" + playlist_id  + "/tracks?access_token=" + token
+     URL2 = "https://api.spotify.com/v1/playlists/"+ playlist_id +"?access_token=" + token  
+     r2 = requests.get(URL2)
+     pyname = 'Playlist/' + r2.json()['name']
      r = requests.get(url = URL) 
      total = r.json()['total']
      count=0
@@ -109,7 +121,7 @@ def getplay(playlistlink):
          ytdl(ytsq(r.json()['items'][i]["track"]["external_urls"]["spotify"])[1])
          for name in os.listdir():
            if ytsq(r.json()['items'][i]["track"]["external_urls"]["spotify"])[0] in name:
-              rclone(name)
+              rclone(name,pyname)
 
       else:
          if count ==total:
@@ -119,4 +131,3 @@ def getplay(playlistlink):
          r = requests.get(url = URL)
      return items
          
-getplay("https://open.spotify.com/playlist/6dBDprurUuVxaKlC2B2CJF?si=LZgnzMPJSlijLLlfRnd-5A")

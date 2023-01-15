@@ -48,23 +48,22 @@ async def dl(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     link = update.message.text
     if link[4:].startswith("https") or link.startswith("http"):
           if "spotify" in link[4:]:
-             print('spotify')
              ytlink = ytsq(link[4:])
              ytdl(ytlink[1])
              for name in os.listdir():
                if ytlink[0] in name: 
                 await context.bot.sendAudio(update.effective_chat.id, audio=open(name, 'rb'))
                 write(link[4:],name)
-                #rclone(name)
-                os.system("rm '"+name+"'")
+                rclone(name,'Music/DL')
+                #os.system("rm '"+name+"'")
           else:
                  info =  dytdl(link[4:])
                  for name in os.listdir():
                      if info[0] in name:
-                      await context.bot.sendVideo(update.effective_chat.id, video=open(name, 'rb'))
+                      #await context.bot.sendVideo(update.effective_chat.id, video=open(name, 'rb'))
                       write(link[4:],name)
-                      #rclone(name)
-                      os.system("rm '"+name+"'")
+                      rclone(name,'Videos')
+                     
              
 
     else:
@@ -86,12 +85,23 @@ async def srh(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
          if ytsn(query[7:])[0] in name:
             await context.bot.sendAudio(update.effective_chat.id, audio=open(name, 'rb'),performer="Spidy")
             write(ytsn(query[7:])[1],name)
-            #rclone(name)
-            os.system("rm '"+name+"'")
+            rclone(name,'Music')
+
+
+
+
+
+async def url(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        link = update.message.text[8:]
+        await update.message.reply_text('Added Playlist...'+link)
+        pwrite(link)
 
 
 async def uppl(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        
+     for link in pread():
+        getplay(link[0])
+     await update.message.reply_text('Updated Playlist..')
+         
      
 
 
@@ -112,6 +122,7 @@ def main() -> None:
     application.add_handler(CommandHandler("dl", dl))
     application.add_handler(CommandHandler("search", srh))
     application.add_handler(CommandHandler("update", uppl))
+    application.add_handler(CommandHandler("addurl", url))
 
     # on non command i.e message - echo the message on Telegram
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
